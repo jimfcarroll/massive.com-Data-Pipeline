@@ -131,7 +131,7 @@ def fetch_all_options_contracts(underlying_ticker: str = None,
                                 min_expiration_date_exclusive : Union[str, datetime.date, datetime.datetime ] = None, 
                                 expired: bool = True, pagination_limit = 1000):
     """
-    Fetches all options contracts for a given underlying ticker from Polygon.io, including expired contracts.
+    Fetches all options contracts for a given underlying ticker from massive.com, including expired contracts.
 
     Args:
         underlying_ticker (str): The underlying stock ticker (e.g., "AAPL").
@@ -184,10 +184,10 @@ def fetch_all_options_contracts(underlying_ticker: str = None,
         print(f"Error fetching options contracts for {underlying_ticker} while {'' if expired else 'without '}including expired: {e}")
         raise
 
-def fetch_options_contract_from_polygon(options_ticker: str = None, 
+def fetch_options_contract_from_massive(options_ticker: str = None,
                                         as_of: Union[datetime.date, str] = None) -> Optional[OptionsContract]:
     """
-    Fetches a single options contract from Polygon.io by its ticker symbol.
+    Fetches a single options contract from massive.com by its ticker symbol.
     
     Args:
         options_ticker: The options contract ticker symbol (e.g., "O:AAPL230915C00150000")
@@ -227,7 +227,7 @@ def to_contract_parquet_file_path(contract: Union[OptionsContract, dict], base_d
     <base_dir>/underlying_ticker=<ticker>/<year>.parquet
     
     Args:
-        contract: Either a Polygon OptionsContract object or a dictionary containing
+        contract: Either an OptionsContract object or a dictionary containing
                  contract data with 'underlying_ticker' and 'expiration_date' fields
         base_dir: Optional root directory for the parquet files. If None, returns
                  only the relative path
@@ -259,10 +259,10 @@ def to_contract_parquet_file_path(contract: Union[OptionsContract, dict], base_d
 
 def options_contract_to_dict(contract: OptionsContract, skip_underlying_ticker = False) -> dict:
     """
-    Converts a Polygon OptionsContract object to a dictionary format suitable for storage.
-    
+    Converts an OptionsContract object to a dictionary format suitable for storage.
+
     Args:
-        contract: Polygon OptionsContract object to convert
+        contract: OptionsContract object to convert
         skip_underlying_ticker: If True, excludes the underlying_ticker field from the output.
                               Used when storing data in partitioned parquet files where
                               underlying_ticker is part of the partition path.
@@ -325,9 +325,9 @@ def get_options_contract(options_ticker: str = None,
     if isinstance(as_of, str):
         as_of = datetime.datetime.strptime(as_of, '%Y-%m-%d').date()
 
-    contract = fetch_options_contract_from_polygon(options_ticker, as_of - datetime.timedelta(days=1))
+    contract = fetch_options_contract_from_massive(options_ticker, as_of - datetime.timedelta(days=1))
     if contract is None:
-        contract = fetch_options_contract_from_polygon(options_ticker)
+        contract = fetch_options_contract_from_massive(options_ticker)
     if contract is None:
         contract = parse_ticker(options_ticker)
 

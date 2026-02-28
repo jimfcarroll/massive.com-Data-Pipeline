@@ -10,7 +10,7 @@ _MARKET_DATA_TABLES = ['stocks_day', 'stocks_min', 'options_day', 'options_min']
 
 
 def _migrate_v1(data_dirs):
-    """Volume int64 → float64 (Polygon fractional shares, Feb 2026)."""
+    """Volume int64 → float64 (Massive fractional shares, Feb 2026)."""
     from db.db import PARQUET_SCHEMA
     for table in _MARKET_DATA_TABLES:
         path = data_dirs[table]
@@ -21,7 +21,7 @@ def _migrate_v1(data_dirs):
 # Ordered list of (version, description, function).
 # Each function receives the data_dirs dict.
 MIGRATIONS = [
-    (1, "volume int64 to float64 (Polygon fractional shares)", _migrate_v1),
+    (1, "volume int64 to float64 (Massive fractional shares)", _migrate_v1),
 ]
 
 
