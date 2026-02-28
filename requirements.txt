@@ -1,0 +1,5 @@
+pandas
+polygon-api-client
+requests
+duckdb
+pyarrow

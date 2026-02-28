@@ -1,0 +1,8 @@
+.idea
+__pycache__
+
+.vscode
+.env
+
+/views.sql
+/config.py
