@@ -3,3 +3,4 @@ polygon-api-client
 requests
 duckdb
 pyarrow
+pytz
