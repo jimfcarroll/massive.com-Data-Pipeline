@@ -8,3 +8,7 @@ __pycache__
 /config.py
 
 .venv
+
+/devcontainer-state/
+/.devcontainer/
+/.claude/

@@ -75,6 +75,7 @@ def update_parquet_file(file_path, new_data, sort_key=None, schema=None, unique_
 
     if unique_field is not None:
         print(f"Deduping based on {unique_field}. Starting count {combined_table.num_rows}")
+        original_schema = combined_table.schema
         # Convert the table to a pandas DataFrame for deduplication
         combined_df = combined_table.to_pandas()
 
@@ -84,8 +85,8 @@ def update_parquet_file(file_path, new_data, sort_key=None, schema=None, unique_
         # Reset the index to avoid the '__index_level_0__' column
         deduplicated_df.reset_index(drop=True, inplace=True)
 
-        # Convert back to a PyArrow Table
-        combined_table = pa.Table.from_pandas(deduplicated_df)
+        # Convert back to a PyArrow Table, preserving the original schema
+        combined_table = pa.Table.from_pandas(deduplicated_df, schema=original_schema)
         print(f"Deduping based on {unique_field}. Ending count {combined_table.num_rows}", flush=True)
 
     # Optional sorting by the specified key(s)
@@ -234,6 +235,8 @@ def rewrite_parquet_file(file_path: str, schema: pa.Schema):
                 if pa.types.is_int64(original_column.type) and pa.types.is_float64(field.type):
                     casted_columns.append(original_column.cast(field.type))
                 elif pa.types.is_null(original_column.type) and pa.types.is_string(field.type):
+                    casted_columns.append(original_column.cast(field.type))
+                elif pa.types.is_large_string(original_column.type) and pa.types.is_string(field.type):
                     casted_columns.append(original_column.cast(field.type))
                 else:
                     raise ValueError(f"Cannot cast column {column_name} from {original_column.type} to {field.type}")

@@ -10,8 +10,8 @@ import pyarrow.parquet as pq
 import pytz
 
 from db.connection import DuckDBConnectionWrapper
-from db.contracts import (fetch_all_options_contracts, load_missing_contracts,
-                          options_contract_to_dict,
+from db.contracts import (_contracts_schema, fetch_all_options_contracts,
+                          load_missing_contracts, options_contract_to_dict,
                           to_contract_parquet_file_path, update_parquet_file)
 from db.migrations import run_pending_migrations
 from utils.parquet import parquet_file_exists
@@ -77,7 +77,7 @@ def create_or_get(root: str, parquet_subdir: str, fail_if_not_exists: bool = Fal
         contract = next(fetch_all_options_contracts(pagination_limit = 1))
         contract_dict = options_contract_to_dict(contract, skip_underlying_ticker=True)
         pf_path = to_contract_parquet_file_path(contract,data_dirs['contracts'])
-        update_parquet_file(pf_path, contract_dict, 'expiration_date')
+        update_parquet_file(pf_path, contract_dict, 'expiration_date', _contracts_schema)
 
     # Create a DuckDB connection
     connection = duckdb.connect(database=':memory:')

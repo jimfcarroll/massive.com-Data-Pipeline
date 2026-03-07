@@ -3,7 +3,7 @@ import os
 from utils.parquet import correct_parquet_files
 
 # Bump this when adding new migrations.
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 # Tables that use PARQUET_SCHEMA from db.py (excludes contracts, which has its own schema).
 _MARKET_DATA_TABLES = ['stocks_day', 'stocks_min', 'options_day', 'options_min']
@@ -18,10 +18,19 @@ def _migrate_v1(data_dirs):
         correct_parquet_files(path, PARQUET_SCHEMA)
 
 
+def _migrate_v2(data_dirs):
+    """Contract large_string → string (PyArrow from_pandas inference change)."""
+    from db.contracts import _contracts_schema
+    path = data_dirs['contracts']
+    print(f"  Migrating contracts ...")
+    correct_parquet_files(path, _contracts_schema)
+
+
 # Ordered list of (version, description, function).
 # Each function receives the data_dirs dict.
 MIGRATIONS = [
     (1, "volume int64 to float64 (Massive fractional shares)", _migrate_v1),
+    (2, "contracts large_string to string (PyArrow inference change)", _migrate_v2),
 ]
 
 
